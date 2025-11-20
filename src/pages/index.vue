@@ -1,9 +1,11 @@
 <template>
-  <div>{{ test }}</div>
+  <div class="h-full w-full relative">
+    <Vis />
+  </div>
 </template>
 
 <script setup lang="ts">
-const test = ref(1);
+import Vis from './components/vis/index.vue';
 </script>
 
 <style scoped></style>
