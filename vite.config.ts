@@ -31,11 +31,11 @@ export default defineConfig(({mode}) => {
       legacy({
         targets: ['defaults', 'not IE 11'],
       }),
+      vue(),
       VueRouter({
         exclude: ['src/pages/**/components/**'],
         dts: 'src/typed-router.d.ts',
       }),
-      vue(),
       AutoImport({
         imports: ['vue', VueRouterAutoImports],
         resolvers: [ElementPlusResolver()],

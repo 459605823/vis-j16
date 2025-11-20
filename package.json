@@ -14,11 +14,12 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@f80975/viz.js": "^0.3.22",
     "@unocss/reset": "^66.2.3",
     "@vueuse/core": "^13.4.0",
-    "element-plus": "^2.11.1",
     "autoprefixer": "^10.4.21",
     "dayjs": "^1.11.13",
+    "element-plus": "^2.11.1",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.1",
     "vue": "^3.5.17",
@@ -31,6 +32,7 @@
     "@unocss/eslint-plugin": "^66.2.3",
     "@vitejs/plugin-legacy": "^6.1.1",
     "@vitejs/plugin-vue": "^5.2.4",
+    "@vue/compiler-sfc": "^3.5.24",
     "eslint": "^9.29.0",
     "eslint-plugin-format": "^1.0.1",
     "npm-run-all": "^4.1.5",
