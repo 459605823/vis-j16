@@ -1,5 +1,5 @@
 # 构建阶段
-FROM node:20.17.0-alpine AS builder
+FROM node:20-alpine AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -20,7 +20,7 @@ COPY . .
 RUN pnpm build
 
 # 部署阶段
-FROM nginx:stable-alpine
+FROM nginx:alpine
 
 # 复制自定义的 nginx 配置
 COPY nginx.conf /etc/nginx/nginx.conf
