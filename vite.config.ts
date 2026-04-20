@@ -19,11 +19,12 @@ export default defineConfig(({mode}) => {
     server: {
       host: '0.0.0.0',
       proxy: {
+        // 前端请求 /api/* → 代理转发至 PLC WebServer（路径保持不变）
+        // 例：/api/jsonrpc → https://192.168.1.2/api/jsonrpc
         [`${env.VITE_API_BASE_URL}`]: {
-          target: '',
+          target: env.VITE_API_HOST,
           changeOrigin: true,
           secure: false,
-          rewrite: path => path.replace(/^\/api/, ''),
         },
       },
     },

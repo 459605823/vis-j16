@@ -1,17 +1,25 @@
 import type {AfterFetchContext, BeforeFetchContext} from '@vueuse/core';
 import {createFetch} from '@vueuse/core';
+import {tokenStore} from './token';
 
 function beforeFetch({options}: BeforeFetchContext) {
+  const token = tokenStore.get();
+  if (token) {
+    options.headers = {
+      ...(options.headers as Record<string, string>),
+      'X-Auth-Token': token,
+    };
+  }
   return {options};
 }
 
 function afterFetch(ctx: AfterFetchContext) {
-  const {data, response} = ctx;
-  if (response.ok) {
-    if (data.statusCode !== 0) {
-      throw new Error(data.msg);
-    }
-  }
+  // const {data, response} = ctx;
+  // if (response.ok) {
+  //   if (data.statusCode !== 0) {
+  //     throw new Error(data.msg);
+  //   }
+  // }
   return ctx;
 }
 
