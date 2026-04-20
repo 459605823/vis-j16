@@ -2,7 +2,7 @@ services:
   web:
     build: .
     ports:
-      - "80:80"
+      - "38080:80"
     volumes:
       # 将宿主机的 dist 目录挂载到容器内，替换文件后无需重启容器
       - ./dist:/usr/share/nginx/html:ro
