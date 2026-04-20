@@ -1,7 +1,6 @@
 FROM nginx:alpine
 
-# 复制自定义的 nginx 配置
-COPY nginx.conf /etc/nginx/nginx.conf
+# nginx.conf 和 dist 均通过 volume 挂载自宿主机，无需在此复制
 
 # 暴露端口
 EXPOSE 80
