@@ -1,11 +1,12 @@
 services:
-  web:
-    build: .
+  screen:
+    image: nginx:alpine
+    container_name: vis-screen
     ports:
       - "38080:80"
     volumes:
       # 将宿主机的 dist 目录挂载到容器内，替换文件后无需重启容器
       - ./dist:/usr/share/nginx/html:ro
-      # nginx 配置文件同样从宿主机挂载，修改后执行 docker compose exec web nginx -s reload 即可
+      # nginx 配置文件同样从宿主机挂载，修改后执行 docker compose exec screen nginx -s reload 即可
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     restart: unless-stopped

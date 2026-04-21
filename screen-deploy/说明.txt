@@ -1,0 +1,4 @@
+1、先停止之前部署的容器，打开终端，输入命令 docker ps 找到端口为38080的容器ID，然后输入命令 docker stop 容器ID 停止容器，再执行命令 docker rm 容器ID 删除容器。
+2、右键点击大屏部署文件夹，选择在终端中打开，执行docker load -i nginx-alpine.tar 加载nginx镜像。
+3、执行docker compose up -d 启动容器，等待容器启动成功，打开大屏软件即可看到大屏界面。
+4、如果需要修改大屏界面，直接修改dist目录下的文件即可，无需重启容器。如果需要修改nginx配置，修改nginx.conf文件后执行 docker compose exec screen nginx -s reload 即可让修改生效。
