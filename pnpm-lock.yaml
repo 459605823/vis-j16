@@ -17,6 +17,9 @@ importers:
       '@vueuse/core':
         specifier: ^13.4.0
         version: 13.9.0(vue@3.5.24(typescript@5.8.3))
+      autofit.js:
+        specifier: ^3.2.8
+        version: 3.2.8
       autoprefixer:
         specifier: ^10.4.21
         version: 10.4.22(postcss@8.5.6)
@@ -1658,6 +1661,9 @@ packages:
     resolution: {integrity: sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==}
     engines: {node: '>= 4.5.0'}
     hasBin: true
+
+  autofit.js@3.2.8:
+    resolution: {integrity: sha512-albZNwDIXvcRneEDyZLW3uAIOH0cUQG/TnCGQ7jpfnL0gPn/+1ZNVRuEz3ZuzZvVkQ4HQRplGHjUeMRtPNxjLQ==}
 
   autoprefixer@10.4.22:
     resolution: {integrity: sha512-ARe0v/t9gO28Bznv6GgqARmVqcWOV3mfgUPn9becPHMiD3o9BwlRgaeccZnwTpZ7Zwqrm+c1sUSsMxIzQzc8Xg==}
@@ -6009,6 +6015,8 @@ snapshots:
   async-validator@4.2.5: {}
 
   atob@2.1.2: {}
+
+  autofit.js@3.2.8: {}
 
   autoprefixer@10.4.22(postcss@8.5.6):
     dependencies:

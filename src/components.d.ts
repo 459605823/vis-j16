@@ -8,10 +8,17 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Cams: typeof import('./components/cams/index.vue')['default']
     FixedAspectRatio: typeof import('./components/FixedAspectRatio.vue')['default']
+    Flow: typeof import('./components/flow/index.vue')['default']
     InfinityScroll: typeof import('./components/InfinityScroll.vue')['default']
     Number: typeof import('./components/Number.vue')['default']
+    Pressure: typeof import('./components/pressure/index.vue')['default']
     ScrollTable: typeof import('./components/ScrollTable.vue')['default']
+    Source: typeof import('./components/source/index.vue')['default']
+    Stat: typeof import('./components/stat/index.vue')['default']
+    Strength: typeof import('./components/strength/index.vue')['default']
     SvgIcon: typeof import('./components/SvgIcon.vue')['default']
+    Time: typeof import('./components/time/index.vue')['default']
   }
 }
