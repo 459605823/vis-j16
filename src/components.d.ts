@@ -8,7 +8,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AniGrid: typeof import('./components/AniGrid/index.vue')['default']
+    AniGridAniItem: typeof import('./components/AniGrid/AniItem.vue')['default']
     Cams: typeof import('./components/cams/index.vue')['default']
+    CamsCamPlayer: typeof import('./components/cams/cam-player.vue')['default']
     FixedAspectRatio: typeof import('./components/FixedAspectRatio.vue')['default']
     Flow: typeof import('./components/flow/index.vue')['default']
     InfinityScroll: typeof import('./components/InfinityScroll.vue')['default']

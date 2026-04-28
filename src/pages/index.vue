@@ -6,7 +6,8 @@
           <Pressure />
           <Strength />
         </div>
-        <div class="h-full w-1076px">
+        <div class="flex flex-col gap-16px h-full w-1076px">
+          <AniGrid />
           <Flow />
         </div>
         <div class="flex flex-col h-full w-400px justify-between">
