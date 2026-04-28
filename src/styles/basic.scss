@@ -41,17 +41,44 @@ svg {
 }
 
 @font-face {
-  font-family: DINAlternate-Bold;
-  src: url('/fonts/DIN-Alternate-Bold.ttf');
+  font-family: ali-bold;
+  src: url('/fonts/AlimamaShuHeiTi-Bold.ttf');
 }
 
 @font-face {
-  font-family: YSBT;
-  src: url('/fonts/YouSheBiaoTiHei.ttf');
+  font-family: SHS;
+  src: url('/fonts/SourceHanSansCN.ttf');
 }
 
 .text-gradient {
   --from: #fff;
   --to: #000;
   @include textGradient(var(--from), var(--to));
+}
+
+.section-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-title {
+  height: 34px;
+  line-height: 34px;
+  font-size: 16px;
+  font-weight: bold;
+  padding-left: 22px;
+  font-family: ali-bold;
+  @include textGradient(#dde9ff, #99bcff);
+}
+
+.section-content {
+  flex: 1;
+}
+
+.main-text {
+  font-size: 14px;
+  font-family: SHS;
+  line-height: 22px;
+  color: rgba(255, 255, 255, 0.85);
 }

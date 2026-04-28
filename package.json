@@ -21,6 +21,7 @@
     "autofit.js": "^3.2.8",
     "autoprefixer": "^10.4.21",
     "dayjs": "^1.11.13",
+    "echarts": "^6.0.0",
     "element-plus": "^2.11.1",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.1",

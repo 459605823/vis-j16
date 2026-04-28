@@ -14,6 +14,7 @@ declare module 'vue' {
     InfinityScroll: typeof import('./components/InfinityScroll.vue')['default']
     Number: typeof import('./components/Number.vue')['default']
     Pressure: typeof import('./components/pressure/index.vue')['default']
+    Progress: typeof import('./components/Progress.vue')['default']
     ScrollTable: typeof import('./components/ScrollTable.vue')['default']
     Source: typeof import('./components/source/index.vue')['default']
     Stat: typeof import('./components/stat/index.vue')['default']

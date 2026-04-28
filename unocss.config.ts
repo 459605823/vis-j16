@@ -9,8 +9,8 @@ import {
 export default defineConfig({
   presets: [presetWind4(), presetAttributify()],
   rules: [
-    ['font-din', {'font-family': 'DINAlternate-Bold'}],
-    ['font-ysbt', {'font-family': 'YSBT'}],
+    ['font-ali', {'font-family': 'ali-bold'}],
+    ['font-shs', {'font-family': 'SHS'}],
     ['bg-fill', {'background-size': '100% 100%'}],
   ],
   shortcuts: {
