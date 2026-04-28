@@ -4,6 +4,7 @@
       {{ title }}
       <img :src="statusIcon" alt="status" class="h-24px w-24px right-4px top-2px absolute">
     </div>
+    <video :src="videoSrc" muted autoplay loop class="h-full w-full object-cover" />
   </div>
 </template>
 
@@ -18,6 +19,8 @@ const props = withDefaults(defineProps<{
 }>(), {
   status: 'pending',
 });
+
+const videoSrc = computed(() => `/videos/${props.title}.mp4`);
 
 const statusIcon = computed(() => {
   switch (props.status) {
