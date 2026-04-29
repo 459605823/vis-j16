@@ -9,23 +9,40 @@
       </div>
     </div>
   </div>
+
+  <popwindow
+    v-if="popMode !== null"
+    :mode="popMode"
+    :cam-index="popCamIndex"
+    :cam-urls="camUrls"
+    @close="popMode = null"
+  />
 </template>
 
 <script setup lang="ts">
+import {useEventListener, useFetch} from '@vueuse/core';
 import camPlayer from './cam-player.vue';
+import popwindow from './popwindow.vue';
 
-const camUrls = [
-  'rtsp://admin:admin123@',
-  'rtsp://admin:admin123@',
-  'rtsp://admin:admin123@',
-  'rtsp://admin:admin123@',
-  'rtsp://admin:admin123@',
-  'rtsp://admin:admin123@',
-  'rtsp://admin:admin123@',
-  'rtsp://admin:admin123@',
-  'rtsp://admin:admin123@',
-  'rtsp://admin:admin123@',
-];
+const {data} = useFetch('/config.json').json<{camUrls: string[]}>();
+const camUrls = computed(() => data.value?.camUrls ?? []);
+
+const popMode = ref<'single' | 'all' | null>(null);
+const popCamIndex = ref(0);
+
+useEventListener('keydown', (e: KeyboardEvent) => {
+  // Ctrl+A → 全部模式
+  if (e.key === '`' || e.key === '~') {
+    e.preventDefault();
+    popMode.value = 'all';
+    return;
+  }
+  // 数字键 0-9 → 单路模式（无修饰键）
+  if (!e.ctrlKey && !e.altKey && !e.metaKey && /^\d$/.test(e.key)) {
+    popCamIndex.value = Number(e.key);
+    popMode.value = 'single';
+  }
+});
 </script>
 
 <style scoped lang="scss">
