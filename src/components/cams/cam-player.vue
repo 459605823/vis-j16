@@ -42,7 +42,7 @@ function createPlayer(rtspUrl: string) {
   destroyPlayer();
   status.value = 'loading';
 
-  const streamUrl = `http://localhost:3000/live?rtsp=${encodeURIComponent(rtspUrl)}`;
+  const streamUrl = `ws://localhost:3000/live?rtsp=${encodeURIComponent(rtspUrl)}`;
 
   player = mpegts.createPlayer(
     {
@@ -54,10 +54,12 @@ function createPlayer(rtspUrl: string) {
     },
     {
       enableWorker: false,
-      enableStashBuffer: true,
-      stashInitialSize: 128,
+      enableStashBuffer: false,
       lazyLoad: false,
       autoCleanupSourceBuffer: true,
+      liveBufferLatencyChasing: true,
+      liveBufferLatencyMaxLatency: 2.0,
+      liveBufferLatencyMinRemain: 0.5,
     },
   );
 

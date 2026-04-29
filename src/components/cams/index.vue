@@ -31,7 +31,6 @@ const popMode = ref<'single' | 'all' | null>(null);
 const popCamIndex = ref(0);
 
 useEventListener('keydown', (e: KeyboardEvent) => {
-  // Ctrl+A → 全部模式
   if (e.key === '`' || e.key === '~') {
     e.preventDefault();
     popMode.value = 'all';
