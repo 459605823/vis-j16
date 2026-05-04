@@ -22,6 +22,8 @@ const props = defineProps<{
 const videoEl = ref<HTMLVideoElement>();
 const status = ref<'idle' | 'loading' | 'playing' | 'error'>('idle');
 let player: mpegts.Player | null = null;
+let retryTimer: ReturnType<typeof setTimeout> | null = null;
+const RETRY_INTERVAL = 5000;
 
 function destroyPlayer() {
   if (player) {
@@ -68,6 +70,10 @@ function createPlayer(rtspUrl: string) {
   player.on(mpegts.Events.ERROR, () => {
     status.value = 'error';
     destroyPlayer();
+    retryTimer = setTimeout(() => {
+      retryTimer = null;
+      createPlayer(rtspUrl);
+    }, RETRY_INTERVAL);
   });
 
   player.on(mpegts.Events.MEDIA_INFO, () => {
@@ -79,6 +85,10 @@ function createPlayer(rtspUrl: string) {
 }
 
 watch(() => props.rtsp, (val) => {
+  if (retryTimer) {
+    clearTimeout(retryTimer);
+    retryTimer = null;
+  }
   createPlayer(val);
 });
 
@@ -88,6 +98,10 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  if (retryTimer) {
+    clearTimeout(retryTimer);
+    retryTimer = null;
+  }
   destroyPlayer();
 });
 </script>
