@@ -8,94 +8,94 @@
         <div class="mr-16px w-102px">
           <div class="flex justify-between">
             <div class="main-text">
-              前舱门
+              {{ data[0].label }}
             </div>
             <div class="value">
-              0.5T
+              {{ formatValue(data[0].value) }}
             </div>
           </div>
-          <Progress :value="80" :max="100" />
+          <Progress :value="getDisplayValue(data[0].value)" :max="data[0].max" />
         </div>
         <div class="mr-16px w-102px">
           <div class="flex justify-between">
             <div class="main-text">
-              前起落架
+              {{ data[1].label }}
             </div>
             <div class="value">
-              0.5T
+              {{ formatValue(data[1].value) }}
             </div>
           </div>
-          <Progress :value="80" :max="100" />
+          <Progress :value="getDisplayValue(data[1].value)" :max="data[1].max" />
         </div>
       </div>
       <div class="mb-36px flex">
         <div class="mr-16px w-102px">
           <div class="flex justify-between">
             <div class="main-text">
-              左舱门1
+              {{ data[2].label }}
             </div>
             <div class="value">
-              0.5T
+              {{ formatValue(data[2].value) }}
             </div>
           </div>
-          <Progress :value="80" :max="100" />
+          <Progress :value="getDisplayValue(data[2].value)" :max="data[2].max" />
         </div>
         <div class="mr-16px w-102px">
           <div class="flex justify-between">
             <div class="main-text">
-              左舱门2
+              {{ data[3].label }}
             </div>
             <div class="value">
-              0.5T
+              {{ formatValue(data[3].value) }}
             </div>
           </div>
-          <Progress :value="80" :max="100" />
+          <Progress :value="getDisplayValue(data[3].value)" :max="data[3].max" />
         </div>
         <div class="w-102px">
           <div class="flex justify-between">
             <div class="main-text">
-              左起落架
+              {{ data[4].label }}
             </div>
             <div class="value">
-              0.5T
+              {{ formatValue(data[4].value) }}
             </div>
           </div>
-          <Progress :value="80" :max="100" />
+          <Progress :value="getDisplayValue(data[4].value)" :max="data[4].max" />
         </div>
       </div>
       <div class="flex">
         <div class="mr-16px w-102px">
           <div class="flex justify-between">
             <div class="main-text">
-              右舱门1
+              {{ data[5].label }}
             </div>
             <div class="value">
-              0.5T
+              {{ formatValue(data[5].value) }}
             </div>
           </div>
-          <Progress :value="80" :max="100" />
+          <Progress :value="getDisplayValue(data[5].value)" :max="data[5].max" />
         </div>
         <div class="mr-16px w-102px">
           <div class="flex justify-between">
             <div class="main-text">
-              右舱门2
+              {{ data[6].label }}
             </div>
             <div class="value">
-              0.5T
+              {{ formatValue(data[6].value) }}
             </div>
           </div>
-          <Progress :value="80" :max="100" />
+          <Progress :value="getDisplayValue(data[6].value)" :max="data[6].max" />
         </div>
         <div class="w-102px">
           <div class="flex justify-between">
             <div class="main-text">
-              右起落架
+              {{ data[7].label }}
             </div>
             <div class="value">
-              0.5T
+              {{ formatValue(data[7].value) }}
             </div>
           </div>
-          <Progress :value="80" :max="100" />
+          <Progress :value="getDisplayValue(data[7].value)" :max="data[7].max" />
         </div>
       </div>
     </div>
@@ -103,7 +103,49 @@
 </template>
 
 <script setup lang="ts">
+import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
 
+const data = reactive([
+  {label: '前舱门', variable: 'DataR[16]', value: null as number | null, max: 1},
+  {label: '前起落架', variable: 'DataR[17]', value: null as number | null, max: 10},
+  {label: '左舱门1', variable: 'DataR[18]', value: null as number | null, max: 1},
+  {label: '左舱门2', variable: 'DataR[19]', value: null as number | null, max: 1},
+  {label: '左起落架', variable: 'DataR[20]', value: null as number | null, max: 10},
+  {label: '右舱门1', variable: 'DataR[21]', value: null as number | null, max: 1},
+  {label: '右舱门2', variable: 'DataR[22]', value: null as number | null, max: 1},
+  {label: '右起落架', variable: 'DataR[23]', value: null as number | null, max: 10},
+]);
+
+function getDisplayValue(value: number | null) {
+  return value === null ? 0 : value;
+}
+
+function formatValue(value: number | null) {
+  if (value === null) {
+    return '--T';
+  }
+
+  return `${value.toFixed(1)}T`;
+}
+
+async function fetchStrengthData() {
+  try {
+    const values = await readVariable<number>(data.map(item => item.variable));
+    values.forEach((value, index) => {
+      const strength = Number(value);
+      data[index].value = Number.isFinite(strength) ? strength : null;
+    });
+  } catch (error) {
+    console.error('[Strength] 读取力传感器数据失败:', error);
+  }
+}
+
+fetchStrengthData();
+const timer = setInterval(fetchStrengthData, DATA_REFRESH_INTERVAL);
+
+onUnmounted(() => {
+  clearInterval(timer);
+});
 </script>
 
 <style scoped lang="scss">

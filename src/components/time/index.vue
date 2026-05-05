@@ -10,49 +10,17 @@
             舱门开启时间
           </div>
           <div class="flex flex-col gap-8px">
-            <div class="flex w-full items-center justify-between">
+            <div
+              v-for="item in data_open"
+              :key="item.label"
+              class="flex w-full items-center justify-between"
+            >
               <div class="main-text w-56px">
-                前舱门
+                {{ item.label }}
               </div>
-              <Progress :value="15" :max="60" class="w-70px" />
+              <Progress :value="getDisplayValue(item.value)" :max="TIME_MAX" class="w-70px" />
               <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                左舱门1
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                左舱门2
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                右舱门1
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                右舱门2
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
+                {{ formatValue(item.value) }}
               </div>
             </div>
           </div>
@@ -62,49 +30,17 @@
             舱门关闭时间
           </div>
           <div class="flex flex-col gap-8px">
-            <div class="flex w-full items-center justify-between">
+            <div
+              v-for="item in data_close"
+              :key="item.label"
+              class="flex w-full items-center justify-between"
+            >
               <div class="main-text w-56px">
-                前舱门
+                {{ item.label }}
               </div>
-              <Progress :value="15" :max="60" class="w-70px" />
+              <Progress :value="getDisplayValue(item.value)" :max="TIME_MAX" class="w-70px" />
               <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                左舱门1
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                左舱门2
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                右舱门1
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                右舱门2
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
+                {{ formatValue(item.value) }}
               </div>
             </div>
           </div>
@@ -116,31 +52,17 @@
             起落架升起时间
           </div>
           <div class="flex flex-col gap-8px">
-            <div class="flex w-full items-center justify-between">
+            <div
+              v-for="item in data_gear_up"
+              :key="item.label"
+              class="flex w-full items-center justify-between"
+            >
               <div class="main-text w-56px">
-                前起落架
+                {{ item.label }}
               </div>
-              <Progress :value="15" :max="60" class="w-70px" />
+              <Progress :value="getDisplayValue(item.value)" :max="TIME_MAX" class="w-70px" />
               <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                左起落架
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                右起落架
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
+                {{ formatValue(item.value) }}
               </div>
             </div>
           </div>
@@ -150,31 +72,17 @@
             起落架落下时间
           </div>
           <div class="flex flex-col gap-8px">
-            <div class="flex w-full items-center justify-between">
+            <div
+              v-for="item in data_gear_down"
+              :key="item.label"
+              class="flex w-full items-center justify-between"
+            >
               <div class="main-text w-56px">
-                前起落架
+                {{ item.label }}
               </div>
-              <Progress :value="15" :max="60" class="w-70px" />
+              <Progress :value="getDisplayValue(item.value)" :max="TIME_MAX" class="w-70px" />
               <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                左起落架
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
-              </div>
-            </div>
-            <div class="flex w-full items-center justify-between">
-              <div class="main-text w-56px">
-                右起落架
-              </div>
-              <Progress :value="15" :max="60" class="w-70px" />
-              <div class="value">
-                15秒
+                {{ formatValue(item.value) }}
               </div>
             </div>
           </div>
@@ -185,7 +93,94 @@
 </template>
 
 <script setup lang="ts">
+import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
 
+const TIME_MAX = 60;
+
+// 舱门开启时间
+const data_open = reactive([
+  {label: '前舱门', variable: 'DataR[40]', value: null as number | null},
+  {label: '左舱门1', variable: 'DataR[41]', value: null as number | null},
+  {label: '左舱门2', variable: 'DataR[42]', value: null as number | null},
+  {label: '右舱门1', variable: 'DataR[43]', value: null as number | null},
+  {label: '右舱门2', variable: 'DataR[44]', value: null as number | null},
+]);
+// 舱门关闭时间
+const data_close = reactive([
+  {label: '前舱门', variable: 'DataR[48]', value: null as number | null},
+  {label: '左舱门1', variable: 'DataR[49]', value: null as number | null},
+  {label: '左舱门2', variable: 'DataR[50]', value: null as number | null},
+  {label: '右舱门1', variable: 'DataR[51]', value: null as number | null},
+  {label: '右舱门2', variable: 'DataR[52]', value: null as number | null},
+]);
+// 起落架升起时间
+const data_gear_up = reactive([
+  {label: '前起落架', variable: 'DataR[56]', value: null as number | null},
+  {label: '左起落架', variable: 'DataR[57]', value: null as number | null},
+  {label: '右起落架', variable: 'DataR[58]', value: null as number | null},
+]);
+// 起落架落下时间
+const data_gear_down = reactive([
+  {label: '前起落架', variable: 'DataR[60]', value: null as number | null},
+  {label: '左起落架', variable: 'DataR[61]', value: null as number | null},
+  {label: '右起落架', variable: 'DataR[62]', value: null as number | null},
+]);
+
+function getDisplayValue(value: number | null) {
+  return value === null ? 0 : value;
+}
+
+function formatValue(value: number | null) {
+  if (value === null) {
+    return '--秒';
+  }
+
+  return `${value.toFixed(1)}秒`;
+}
+
+async function fetchTimeData() {
+  try {
+    const allVariables = [
+      ...data_open.map(item => item.variable),
+      ...data_close.map(item => item.variable),
+      ...data_gear_up.map(item => item.variable),
+      ...data_gear_down.map(item => item.variable),
+    ];
+
+    const values = await readVariable<number>(allVariables);
+
+    let index = 0;
+    // 更新舱门开启时间
+    data_open.forEach((item) => {
+      const time = Number(values[index++]);
+      item.value = Number.isFinite(time) ? time : null;
+    });
+    // 更新舱门关闭时间
+    data_close.forEach((item) => {
+      const time = Number(values[index++]);
+      item.value = Number.isFinite(time) ? time : null;
+    });
+    // 更新起落架升起时间
+    data_gear_up.forEach((item) => {
+      const time = Number(values[index++]);
+      item.value = Number.isFinite(time) ? time : null;
+    });
+    // 更新起落架落下时间
+    data_gear_down.forEach((item) => {
+      const time = Number(values[index++]);
+      item.value = Number.isFinite(time) ? time : null;
+    });
+  } catch (error) {
+    console.error('[Time] 读取时间记录数据失败:', error);
+  }
+}
+
+fetchTimeData();
+const timer = setInterval(fetchTimeData, DATA_REFRESH_INTERVAL);
+
+onUnmounted(() => {
+  clearInterval(timer);
+});
 </script>
 
 <style scoped lang="scss">

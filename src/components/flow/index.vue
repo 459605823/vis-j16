@@ -9,7 +9,7 @@
           {{ item.name }}
         </div>
         <div class="sensor-value">
-          {{ item.value }}L/min
+          {{ formatValue(item.value) }}
         </div>
       </div>
     </div>
@@ -17,16 +17,45 @@
 </template>
 
 <script setup lang="ts">
-const data = shallowRef([
-  {name: '传感器1', value: 88},
-  {name: '传感器2', value: 88},
-  {name: '传感器3', value: 88},
-  {name: '传感器4', value: 88},
-  {name: '传感器5', value: 88},
-  {name: '传感器6', value: 88},
-  {name: '传感器7', value: 88},
-  {name: '传感器8', value: 88},
+import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
+
+const data = reactive([
+  {name: '传感器1', variable: 'DataR[24]', value: null as number | null},
+  {name: '传感器2', variable: 'DataR[25]', value: null as number | null},
+  {name: '传感器3', variable: 'DataR[26]', value: null as number | null},
+  {name: '传感器4', variable: 'DataR[27]', value: null as number | null},
+  {name: '传感器5', variable: 'DataR[28]', value: null as number | null},
+  {name: '传感器6', variable: 'DataR[29]', value: null as number | null},
+  {name: '传感器7', variable: 'DataR[30]', value: null as number | null},
+  {name: '传感器8', variable: 'DataR[31]', value: null as number | null},
 ]);
+
+function formatValue(value: number | null) {
+  if (value === null) {
+    return '--L/min';
+  }
+
+  return `${value.toFixed(1)}L/min`;
+}
+
+async function fetchFlowData() {
+  try {
+    const values = await readVariable<number>(data.map(item => item.variable));
+    values.forEach((value, index) => {
+      const flow = Number(value);
+      data[index].value = Number.isFinite(flow) ? flow : null;
+    });
+  } catch (error) {
+    console.error('[Flow] 读取流量传感器数据失败:', error);
+  }
+}
+
+fetchFlowData();
+const timer = setInterval(fetchFlowData, DATA_REFRESH_INTERVAL);
+
+onUnmounted(() => {
+  clearInterval(timer);
+});
 </script>
 
 <style scoped lang="scss">

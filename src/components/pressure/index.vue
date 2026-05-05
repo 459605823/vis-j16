@@ -4,161 +4,20 @@
       压力传感器
     </div>
     <div class="section-content px-18px py-12px flex flex-col gap-12px">
-      <div class="flex items-center">
-        <img src="@/assets/images/压力传感器 - 前.png" class="mr-24px h-60px w-60px">
+      <div v-for="group in groups" :key="group.name" class="flex items-center">
+        <img :src="group.image" class="mr-24px h-60px w-60px">
         <div class="flex flex-1 flex-col gap-4px">
-          <div class="flex w-full items-center justify-between">
+          <div
+            v-for="sensor in group.sensors"
+            :key="sensor.variable"
+            class="flex w-full items-center justify-between"
+          >
             <div class="main-text w-72px">
-              前舱门_1
+              {{ sensor.label }}
             </div>
-            <Progress :value="42" :max="100" class="w-102px" />
+            <Progress :value="getDisplayValue(sensor.value)" :max="PRESSURE_MAX" class="w-102px" />
             <div class="value">
-              42Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              前舱门_2
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              前起落架_1
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              前起落架_2
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="flex items-center">
-        <img src="@/assets/images/压力传感器 - 左.png" class="mr-24px h-60px w-60px">
-        <div class="flex flex-1 flex-col gap-4px">
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              左舱门1_1
-            </div>
-            <Progress :value="42" :max="100" class="w-102px" />
-            <div class="value">
-              42Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              左舱门1_2
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              左舱门2_1
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              左舱门2_2
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              左起落架1
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              左起落架2
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="flex items-center">
-        <img src="@/assets/images/压力传感器 - 右.png" class="mr-24px h-60px w-60px">
-        <div class="flex flex-1 flex-col gap-4px">
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              右舱门1_1
-            </div>
-            <Progress :value="42" :max="100" class="w-102px" />
-            <div class="value">
-              42Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              右舱门1_2
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              右舱门2_1
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              右舱门2_2
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              右起落架1
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
-            </div>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <div class="main-text w-72px">
-              右起落架2
-            </div>
-            <Progress :value="32" :max="100" class="w-102px" />
-            <div class="value">
-              32Mpa
+              {{ formatValue(sensor.value) }}
             </div>
           </div>
         </div>
@@ -168,7 +27,68 @@
 </template>
 
 <script setup lang="ts">
+import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
+import frontImage from '@/assets/images/压力传感器 - 前.png';
+import rightImage from '@/assets/images/压力传感器 - 右.png';
+import leftImage from '@/assets/images/压力传感器 - 左.png';
 
+const PRESSURE_MAX = 42;
+
+const data = reactive([
+  {label: '前舱门_1', variable: 'DataR[0]', value: null as number | null},
+  {label: '前舱门_2', variable: 'DataR[1]', value: null as number | null},
+  {label: '前起落架_1', variable: 'DataR[2]', value: null as number | null},
+  {label: '前起落架_2', variable: 'DataR[3]', value: null as number | null},
+  {label: '左舱门1_1', variable: 'DataR[4]', value: null as number | null},
+  {label: '左舱门1_2', variable: 'DataR[5]', value: null as number | null},
+  {label: '左舱门2_1', variable: 'DataR[6]', value: null as number | null},
+  {label: '左舱门2_2', variable: 'DataR[7]', value: null as number | null},
+  {label: '左起落架1', variable: 'DataR[8]', value: null as number | null},
+  {label: '左起落架2', variable: 'DataR[9]', value: null as number | null},
+  {label: '右舱门1_1', variable: 'DataR[10]', value: null as number | null},
+  {label: '右舱门1_2', variable: 'DataR[11]', value: null as number | null},
+  {label: '右舱门2_1', variable: 'DataR[12]', value: null as number | null},
+  {label: '右舱门2_2', variable: 'DataR[13]', value: null as number | null},
+  {label: '右起落架1', variable: 'DataR[14]', value: null as number | null},
+  {label: '右起落架2', variable: 'DataR[15]', value: null as number | null},
+]);
+
+const groups = computed(() => [
+  {name: 'front', image: frontImage, sensors: data.slice(0, 4)},
+  {name: 'left', image: leftImage, sensors: data.slice(4, 10)},
+  {name: 'right', image: rightImage, sensors: data.slice(10, 16)},
+]);
+
+function getDisplayValue(value: number | null) {
+  return value === null ? 0 : value;
+}
+
+function formatValue(value: number | null) {
+  if (value === null) {
+    return '--Mpa';
+  }
+
+  return `${value.toFixed(1)}Mpa`;
+}
+
+async function fetchPressureData() {
+  try {
+    const values = await readVariable<number>(data.map(item => item.variable));
+    values.forEach((value, index) => {
+      const pressure = Number(value);
+      data[index].value = Number.isFinite(pressure) ? pressure : null;
+    });
+  } catch (error) {
+    console.error('[Pressure] 读取压力传感器数据失败:', error);
+  }
+}
+
+fetchPressureData();
+const timer = setInterval(fetchPressureData, DATA_REFRESH_INTERVAL);
+
+onUnmounted(() => {
+  clearInterval(timer);
+});
 </script>
 
 <style scoped lang="scss">

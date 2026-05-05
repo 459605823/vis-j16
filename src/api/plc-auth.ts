@@ -24,6 +24,8 @@ const DB_NAME = '"WebData"';
 // 保活间隔：60 秒（PLC Session 超时为 120 秒）
 const KEEPALIVE_INTERVAL_MS = 60 * 1000;
 
+export const DATA_REFRESH_INTERVAL = 1000;
+
 // 自增 RPC ID
 let _idCounter = 0;
 function nextId() {

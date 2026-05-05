@@ -7,18 +7,18 @@
       <div class="flex flex-col h-full justify-between">
         <div class="stat-item">
           <div class="stat-name">
-            液压源回游压力
+            {{ data[0].label }}
           </div>
           <div class="stat-value">
-            1Mpa
+            {{ formatPressure(data[0].value) }}
           </div>
         </div>
         <div class="stat-item">
           <div class="stat-name">
-            液压源流量
+            {{ data[1].label }}
           </div>
           <div class="stat-value">
-            88L/min
+            {{ formatFlow(data[1].value) }}
           </div>
         </div>
       </div>
@@ -29,12 +29,32 @@
 
 <script setup lang="ts">
 import * as echarts from 'echarts';
+import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
 import EchartsControl from '@/composables/EchartsControl';
 
-const chartData = shallowRef([
-  {name: '设定压力', value: 27},
-  {name: '实际压力', value: 19},
+const data = reactive([
+  {label: '液压源回游压力', variable: 'DataR[66]', value: null as number | null},
+  {label: '液压源流量', variable: 'DataR[67]', value: null as number | null},
 ]);
+
+const chartData = reactive([
+  {name: '设定压力', value: null as number | null, variable: 'DataR[64]'},
+  {name: '实际压力', value: null as number | null, variable: 'DataR[65]'},
+]);
+
+function formatPressure(value: number | null) {
+  if (value === null) {
+    return '--Mpa';
+  }
+  return `${value.toFixed(1)}Mpa`;
+}
+
+function formatFlow(value: number | null) {
+  if (value === null) {
+    return '--L/min';
+  }
+  return `${value.toFixed(1)}L/min`;
+}
 
 const {chartBox} = EchartsControl(() => ({
   legend: {show: false},
@@ -74,6 +94,38 @@ const {chartBox} = EchartsControl(() => ({
     },
   ],
 }));
+
+async function fetchSourceData() {
+  try {
+    const allVariables = [
+      ...chartData.map(item => item.variable),
+      ...data.map(item => item.variable),
+    ];
+
+    const values = await readVariable<number>(allVariables);
+
+    // 更新图表数据
+    chartData.forEach((item, index) => {
+      const pressure = Number(values[index]);
+      item.value = Number.isFinite(pressure) ? pressure : null;
+    });
+
+    // 更新统计数据
+    data.forEach((item, index) => {
+      const value = Number(values[chartData.length + index]);
+      item.value = Number.isFinite(value) ? value : null;
+    });
+  } catch (error) {
+    console.error('[Source] 读取液压源数据失败:', error);
+  }
+}
+
+fetchSourceData();
+const timer = setInterval(fetchSourceData, DATA_REFRESH_INTERVAL);
+
+onUnmounted(() => {
+  clearInterval(timer);
+});
 </script>
 
 <style scoped lang="scss">

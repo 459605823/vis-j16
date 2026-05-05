@@ -4,20 +4,12 @@
       测试总数
     </div>
     <div class="section-content px-16px py-12px flex gap-16px">
-      <div class="stat-item">
+      <div v-for="item in data" :key="item.label" class="stat-item">
         <div class="stat-name">
-          测试计划总数
+          {{ item.label }}
         </div>
         <div class="stat-value">
-          24
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-name">
-          测试计划当前数量
-        </div>
-        <div class="stat-value">
-          24
+          {{ formatValue(item.value) }}
         </div>
       </div>
     </div>
@@ -25,7 +17,39 @@
 </template>
 
 <script setup lang="ts">
+import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
 
+const data = reactive([
+  {label: '测试计划总数', variable: 'DataI[0]', value: null as number | null},
+  {label: '测试计划当前数量', variable: 'DataI[1]', value: null as number | null},
+]);
+
+function formatValue(value: number | null) {
+  if (value === null) {
+    return '--';
+  }
+
+  return Math.floor(value).toString();
+}
+
+async function fetchStatData() {
+  try {
+    const values = await readVariable<number>(data.map(item => item.variable));
+    values.forEach((value, index) => {
+      const count = Number(value);
+      data[index].value = Number.isFinite(count) ? count : null;
+    });
+  } catch (error) {
+    console.error('[Stat] 读取测试总数数据失败:', error);
+  }
+}
+
+fetchStatData();
+const timer = setInterval(fetchStatData, DATA_REFRESH_INTERVAL);
+
+onUnmounted(() => {
+  clearInterval(timer);
+});
 </script>
 
 <style scoped lang="scss">
