@@ -4,7 +4,13 @@
       {{ title }}
       <img :src="statusIcon" alt="status" class="h-24px w-24px right-4px top-2px absolute">
     </div>
-    <video :src="videoSrc" muted autoplay loop class="h-full w-full object-cover" />
+    <video
+      ref="videoRef"
+      :src="videoSrc"
+      muted
+      class="h-full w-full object-cover"
+      @loadedmetadata="onVideoLoaded"
+    />
   </div>
 </template>
 
@@ -16,11 +22,15 @@ import successIcon from '@/assets/images/绿色.png';
 const props = withDefaults(defineProps<{
   title: string;
   status?: 'pending' | 'success' | 'error';
+  playing?: boolean;
 }>(), {
   status: 'pending',
+  playing: false,
 });
 
 const videoSrc = computed(() => `/videos/${props.title}.mp4`);
+const videoRef = ref<HTMLVideoElement>();
+const isVideoLoaded = ref(false);
 
 const statusIcon = computed(() => {
   switch (props.status) {
@@ -32,6 +42,34 @@ const statusIcon = computed(() => {
       return errorIcon;
     default:
       return pendingIcon;
+  }
+});
+
+// 视频加载完成
+function onVideoLoaded() {
+  isVideoLoaded.value = true;
+}
+
+// 监听 playing 状态变化，控制视频播放
+watch(() => props.playing, (isPlaying) => {
+  if (!videoRef.value || !isVideoLoaded.value) return;
+
+  if (isPlaying) {
+    // 开始播放
+    videoRef.value.currentTime = 0; // 从头开始
+    videoRef.value.play().catch(err => {
+      console.warn(`[AniItem] 视频播放失败: ${props.title}`, err);
+    });
+  } else {
+    // 停止播放
+    videoRef.value.pause();
+  }
+}, { immediate: true });
+
+// 当 status 为 success 时，确保视频显示最后一帧
+watch(() => props.status, (status) => {
+  if (status === 'success' && videoRef.value && isVideoLoaded.value) {
+    videoRef.value.currentTime = videoRef.value.duration || 0;
   }
 });
 </script>
