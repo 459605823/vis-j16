@@ -8,8 +8,9 @@
       ref="videoRef"
       :src="videoSrc"
       muted
+      preload="auto"
       class="h-full w-full object-cover"
-      @loadedmetadata="onVideoLoaded"
+      @loadeddata="onVideoLoaded"
     />
   </div>
 </template>
@@ -45,33 +46,37 @@ const statusIcon = computed(() => {
   }
 });
 
-// 视频加载完成
+// 视频加载完成，seek 到 0.001s 以渲染第一帧
 function onVideoLoaded() {
   isVideoLoaded.value = true;
+  if (videoRef.value) {
+    videoRef.value.currentTime = 0.001;
+  }
+
+  // 监听 playing 状态变化，控制视频播放
+  watch(() => props.playing, (isPlaying) => {
+    if (!videoRef.value || !isVideoLoaded.value)
+      return;
+
+    if (isPlaying) {
+      // 开始播放
+      videoRef.value.currentTime = 0; // 从头开始
+      videoRef.value.play().catch((err) => {
+        console.warn(`[AniItem] 视频播放失败: ${props.title}`, err);
+      });
+    } else {
+      // 停止播放
+      videoRef.value.pause();
+    }
+  }, {immediate: true});
+
+  // 当 status 为 success 时，确保视频显示最后一帧
+  watch(() => props.status, (status) => {
+    if (status === 'success' && videoRef.value && isVideoLoaded.value) {
+      videoRef.value.currentTime = videoRef.value.duration || 0;
+    }
+  });
 }
-
-// 监听 playing 状态变化，控制视频播放
-watch(() => props.playing, (isPlaying) => {
-  if (!videoRef.value || !isVideoLoaded.value) return;
-
-  if (isPlaying) {
-    // 开始播放
-    videoRef.value.currentTime = 0; // 从头开始
-    videoRef.value.play().catch(err => {
-      console.warn(`[AniItem] 视频播放失败: ${props.title}`, err);
-    });
-  } else {
-    // 停止播放
-    videoRef.value.pause();
-  }
-}, { immediate: true });
-
-// 当 status 为 success 时，确保视频显示最后一帧
-watch(() => props.status, (status) => {
-  if (status === 'success' && videoRef.value && isVideoLoaded.value) {
-    videoRef.value.currentTime = videoRef.value.duration || 0;
-  }
-});
 </script>
 
 <style scoped lang="scss">
