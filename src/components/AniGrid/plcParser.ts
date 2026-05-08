@@ -5,12 +5,18 @@
 
 /**
  * 提取 WORD 中指定位的值
- * @param word WORD 值 (0-65535)
- * @param bitIndex 位索引 (0-15)，0 表示最低位
+ *
+ * PLC 通过 JSON-RPC 传输的 WORD 为十进制整数（如 5 表示二进制 0000000000000101）。
+ * JavaScript 位运算符会自动将操作数转为 32 位整数，即隐式完成"十进制 → 二进制"的转换，
+ * 再对指定位做掩码提取。使用 `>>> 0` 确保无符号 32 位整数处理，防止符号位异常。
+ *
+ * @param word    PLC 传来的十进制 WORD 值 (0-65535)
+ * @param bitIndex 位索引 (0-15)，0 表示最低位（LSB）
  * @returns 该位是否为 1
  */
 export function getBit(word: number, bitIndex: number): boolean {
-  return (word & (1 << bitIndex)) !== 0;
+  // >>> 0 将值强制转换为无符号 32 位整数，再做位掩码
+  return ((word >>> 0) & (1 << bitIndex)) !== 0;
 }
 
 /**

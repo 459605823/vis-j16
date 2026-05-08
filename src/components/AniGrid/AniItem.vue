@@ -8,9 +8,9 @@
       ref="videoRef"
       :src="videoSrc"
       muted
-      preload="auto"
+      preload="metadata"
       class="h-full w-full object-cover"
-      @loadeddata="onVideoLoaded"
+      @loadedmetadata="onVideoMetadataLoaded"
     />
   </div>
 </template>
@@ -46,37 +46,35 @@ const statusIcon = computed(() => {
   }
 });
 
-// 视频加载完成，seek 到 0.001s 以渲染第一帧
-function onVideoLoaded() {
-  isVideoLoaded.value = true;
+// metadata 加载完成后 seek 到第一帧（只触发极少量数据下载，不预下载整个视频）
+function onVideoMetadataLoaded() {
   if (videoRef.value) {
     videoRef.value.currentTime = 0.001;
+    isVideoLoaded.value = true;
   }
-
-  // 监听 playing 状态变化，控制视频播放
-  watch(() => props.playing, (isPlaying) => {
-    if (!videoRef.value || !isVideoLoaded.value)
-      return;
-
-    if (isPlaying) {
-      // 开始播放
-      videoRef.value.currentTime = 0; // 从头开始
-      videoRef.value.play().catch((err) => {
-        console.warn(`[AniItem] 视频播放失败: ${props.title}`, err);
-      });
-    } else {
-      // 停止播放
-      videoRef.value.pause();
-    }
-  }, {immediate: true});
-
-  // 当 status 为 success 时，确保视频显示最后一帧
-  watch(() => props.status, (status) => {
-    if (status === 'success' && videoRef.value && isVideoLoaded.value) {
-      videoRef.value.currentTime = videoRef.value.duration || 0;
-    }
-  });
 }
+
+// 控制播放 —— 在 setup 作用域中创建，生命周期由组件管理
+watch(() => props.playing, (isPlaying) => {
+  if (!videoRef.value || !isVideoLoaded.value)
+    return;
+
+  if (isPlaying) {
+    videoRef.value.currentTime = 0;
+    videoRef.value.play().catch((err) => {
+      console.warn(`[AniItem] 视频播放失败: ${props.title}`, err);
+    });
+  } else {
+    videoRef.value.pause();
+  }
+});
+
+// status 变为 success 时跳到最后一帧
+watch(() => props.status, (status) => {
+  if (status === 'success' && videoRef.value && isVideoLoaded.value) {
+    videoRef.value.currentTime = videoRef.value.duration || 0;
+  }
+});
 </script>
 
 <style scoped lang="scss">
