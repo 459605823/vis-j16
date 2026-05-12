@@ -3,8 +3,8 @@
     <div class="section-title">
       液压源
     </div>
-    <div class="section-content px-12px py-16px flex">
-      <div class="flex flex-col h-full justify-between">
+    <div class="section-content px-12px py-16px">
+      <div class="stat-grid">
         <div class="stat-item">
           <div class="stat-name">
             {{ data[0].label }}
@@ -18,28 +18,38 @@
             {{ data[1].label }}
           </div>
           <div class="stat-value">
-            {{ formatFlow(data[1].value) }}
+            {{ formatPressure(data[1].value) }}
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-name">
+            {{ data[2].label }}
+          </div>
+          <div class="stat-value">
+            {{ formatPressure(data[2].value) }}
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-name">
+            {{ data[3].label }}
+          </div>
+          <div class="stat-value">
+            {{ formatFlow(data[3].value) }}
           </div>
         </div>
       </div>
-      <div ref="chartBox" class="flex-1 h-full" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import * as echarts from 'echarts';
 import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
-import EchartsControl from '@/composables/EchartsControl';
 
 const data = reactive([
-  {label: '液压源回游压力', variable: 'DataR[66]', value: null as number | null},
+  {label: '液压源设定压力', variable: 'DataR[64]', value: null as number | null},
+  {label: '液压源实际压力', variable: 'DataR[65]', value: null as number | null},
+  {label: '液压源回油压力', variable: 'DataR[66]', value: null as number | null},
   {label: '液压源流量', variable: 'DataR[67]', value: null as number | null},
-]);
-
-const chartData = reactive([
-  {name: '设定压力', value: null as number | null, variable: 'DataR[64]'},
-  {name: '实际压力', value: null as number | null, variable: 'DataR[65]'},
 ]);
 
 function formatPressure(value: number | null) {
@@ -56,63 +66,13 @@ function formatFlow(value: number | null) {
   return `${value.toFixed(1)}L/min`;
 }
 
-const {chartBox} = EchartsControl(() => ({
-  legend: {show: false},
-  grid: {top: 16, bottom: 24, left: 32, right: 8},
-  xAxis: {
-    type: 'category',
-    data: chartData.value.map(item => item.name),
-    axisLabel: {color: 'rgba(255,255,255,0.65)', fontSize: 12, fontFamily: 'SHS'},
-    axisLine: {lineStyle: {color: 'rgba(255,255,255,0.15)'}},
-    axisTick: {show: false},
-  },
-  yAxis: {
-    type: 'value',
-    axisLabel: {color: 'rgba(255,255,255,0.65)', fontSize: 12},
-    splitLine: {lineStyle: {color: 'rgba(255,255,255,0.1)'}},
-  },
-  series: [
-    {
-      type: 'bar',
-      data: chartData.value.map(item => item.value),
-      barWidth: 8,
-      label: {
-        show: true,
-        position: 'top',
-        color: '#fff',
-        fontSize: 14,
-        fontFamily: 'SHS',
-        formatter: '{c}Mpa',
-      },
-      itemStyle: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          {offset: 0, color: '#4ED0FF'},
-          {offset: 1, color: '#29FFD8'},
-        ]),
-        borderRadius: [4, 4, 0, 0],
-      },
-    },
-  ],
-}));
-
 async function fetchSourceData() {
   try {
-    const allVariables = [
-      ...chartData.map(item => item.variable),
-      ...data.map(item => item.variable),
-    ];
-
+    const allVariables = data.map(item => item.variable);
     const values = await readVariable<number>(allVariables);
 
-    // 更新图表数据
-    chartData.forEach((item, index) => {
-      const pressure = Number(values[index]);
-      item.value = Number.isFinite(pressure) ? pressure : null;
-    });
-
-    // 更新统计数据
     data.forEach((item, index) => {
-      const value = Number(values[chartData.length + index]);
+      const value = Number(values[index]);
       item.value = Number.isFinite(value) ? value : null;
     });
   } catch (error) {
@@ -137,8 +97,14 @@ onUnmounted(() => {
   background-position: center;
 }
 
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
 .stat-item {
-  width: 142px;
+  width: 100%;
   height: 66px;
   border-radius: 2px;
   border: 1px solid #2b4d91;

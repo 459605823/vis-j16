@@ -100,18 +100,18 @@ const TIME_MAX = 60;
 // 舱门开启时间
 const data_open = reactive([
   {label: '前舱门', variable: 'DataR[40]', value: null as number | null},
-  {label: '左舱门1', variable: 'DataR[41]', value: null as number | null},
-  {label: '左舱门2', variable: 'DataR[42]', value: null as number | null},
-  {label: '右舱门1', variable: 'DataR[43]', value: null as number | null},
-  {label: '右舱门2', variable: 'DataR[44]', value: null as number | null},
+  {label: '左前舱门', variable: 'DataR[41]', value: null as number | null},
+  {label: '左后舱门', variable: 'DataR[42]', value: null as number | null},
+  {label: '右前舱门', variable: 'DataR[43]', value: null as number | null},
+  {label: '右后舱门', variable: 'DataR[44]', value: null as number | null},
 ]);
 // 舱门关闭时间
 const data_close = reactive([
   {label: '前舱门', variable: 'DataR[48]', value: null as number | null},
-  {label: '左舱门1', variable: 'DataR[49]', value: null as number | null},
-  {label: '左舱门2', variable: 'DataR[50]', value: null as number | null},
-  {label: '右舱门1', variable: 'DataR[51]', value: null as number | null},
-  {label: '右舱门2', variable: 'DataR[52]', value: null as number | null},
+  {label: '左前舱门', variable: 'DataR[49]', value: null as number | null},
+  {label: '左后舱门', variable: 'DataR[50]', value: null as number | null},
+  {label: '右前舱门', variable: 'DataR[51]', value: null as number | null},
+  {label: '右后舱门', variable: 'DataR[52]', value: null as number | null},
 ]);
 // 起落架升起时间
 const data_gear_up = reactive([

@@ -106,14 +106,14 @@
 import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
 
 const data = reactive([
-  {label: '前舱门', variable: 'DataR[16]', value: null as number | null, max: 1},
-  {label: '前起落架', variable: 'DataR[17]', value: null as number | null, max: 10},
-  {label: '左舱门1', variable: 'DataR[18]', value: null as number | null, max: 1},
-  {label: '左舱门2', variable: 'DataR[19]', value: null as number | null, max: 1},
-  {label: '左起落架', variable: 'DataR[20]', value: null as number | null, max: 10},
-  {label: '右舱门1', variable: 'DataR[21]', value: null as number | null, max: 1},
-  {label: '右舱门2', variable: 'DataR[22]', value: null as number | null, max: 1},
-  {label: '右起落架', variable: 'DataR[23]', value: null as number | null, max: 10},
+  {label: '前舱门', variable: 'DataR[16]', value: null as number | null, max: 10},
+  {label: '前起落架', variable: 'DataR[17]', value: null as number | null, max: 100},
+  {label: '左前舱门', variable: 'DataR[18]', value: null as number | null, max: 10},
+  {label: '左后舱门', variable: 'DataR[19]', value: null as number | null, max: 10},
+  {label: '左起落架', variable: 'DataR[20]', value: null as number | null, max: 100},
+  {label: '右前舱门', variable: 'DataR[21]', value: null as number | null, max: 10},
+  {label: '右后舱门', variable: 'DataR[22]', value: null as number | null, max: 10},
+  {label: '右起落架', variable: 'DataR[23]', value: null as number | null, max: 100},
 ]);
 
 function getDisplayValue(value: number | null) {
@@ -122,10 +122,10 @@ function getDisplayValue(value: number | null) {
 
 function formatValue(value: number | null) {
   if (value === null) {
-    return '--T';
+    return '--KN';
   }
 
-  return `${value.toFixed(1)}T`;
+  return `${value.toFixed(1)}KN`;
 }
 
 async function fetchStrengthData() {

@@ -20,14 +20,14 @@
 import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
 
 const data = reactive([
-  {name: '传感器1', variable: 'DataR[24]', value: null as number | null},
-  {name: '传感器2', variable: 'DataR[25]', value: null as number | null},
-  {name: '传感器3', variable: 'DataR[26]', value: null as number | null},
-  {name: '传感器4', variable: 'DataR[27]', value: null as number | null},
-  {name: '传感器5', variable: 'DataR[28]', value: null as number | null},
-  {name: '传感器6', variable: 'DataR[29]', value: null as number | null},
-  {name: '传感器7', variable: 'DataR[30]', value: null as number | null},
-  {name: '传感器8', variable: 'DataR[31]', value: null as number | null},
+  {name: '前/左/右后舱门放下', variable: 'DataR[24]', value: null as number | null},
+  {name: '前/左舱门收上', variable: 'DataR[25]', value: null as number | null},
+  {name: '右前舱门放下', variable: 'DataR[26]', value: null as number | null},
+  {name: '右舱门收上', variable: 'DataR[27]', value: null as number | null},
+  {name: '前起落架放下', variable: 'DataR[28]', value: null as number | null},
+  {name: '前起落架收上', variable: 'DataR[29]', value: null as number | null},
+  {name: '主起落架放下', variable: 'DataR[30]', value: null as number | null},
+  {name: '主起落架收上', variable: 'DataR[31]', value: null as number | null},
 ]);
 
 function formatValue(value: number | null) {
@@ -74,13 +74,14 @@ onUnmounted(() => {
   border-radius: 2px;
   border: 1px solid #2b4d91;
   background-color: #162c59;
-  padding: 8px 16px;
+  padding: 8px;
 
   .sensor-name {
-    font-size: 14px;
+    font-size: 12px;
     color: rgba(255, 255, 255, 0.85);
     line-height: 22px;
     font-family: SHS;
+    white-space: nowrap;
   }
 
   .sensor-value {

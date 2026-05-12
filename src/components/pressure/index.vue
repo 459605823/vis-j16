@@ -12,7 +12,7 @@
             :key="sensor.variable"
             class="flex w-full items-center justify-between"
           >
-            <div class="main-text w-72px">
+            <div class="main-text w-90px">
               {{ sensor.label }}
             </div>
             <Progress :value="getDisplayValue(sensor.value)" :max="PRESSURE_MAX" class="w-102px" />
@@ -35,22 +35,22 @@ import leftImage from '@/assets/images/压力传感器 - 左.png';
 const PRESSURE_MAX = 42;
 
 const data = reactive([
-  {label: '前舱门_1', variable: 'DataR[0]', value: null as number | null},
-  {label: '前舱门_2', variable: 'DataR[1]', value: null as number | null},
-  {label: '前起落架_1', variable: 'DataR[2]', value: null as number | null},
-  {label: '前起落架_2', variable: 'DataR[3]', value: null as number | null},
-  {label: '左舱门1_1', variable: 'DataR[4]', value: null as number | null},
-  {label: '左舱门1_2', variable: 'DataR[5]', value: null as number | null},
-  {label: '左舱门2_1', variable: 'DataR[6]', value: null as number | null},
-  {label: '左舱门2_2', variable: 'DataR[7]', value: null as number | null},
-  {label: '左起落架1', variable: 'DataR[8]', value: null as number | null},
-  {label: '左起落架2', variable: 'DataR[9]', value: null as number | null},
-  {label: '右舱门1_1', variable: 'DataR[10]', value: null as number | null},
-  {label: '右舱门1_2', variable: 'DataR[11]', value: null as number | null},
-  {label: '右舱门2_1', variable: 'DataR[12]', value: null as number | null},
-  {label: '右舱门2_2', variable: 'DataR[13]', value: null as number | null},
-  {label: '右起落架1', variable: 'DataR[14]', value: null as number | null},
-  {label: '右起落架2', variable: 'DataR[15]', value: null as number | null},
+  {label: '前舱门放下', variable: 'DataR[0]', value: null as number | null},
+  {label: '前舱门收上', variable: 'DataR[1]', value: null as number | null},
+  {label: '前起落架放下', variable: 'DataR[2]', value: null as number | null},
+  {label: '前起落架收上', variable: 'DataR[3]', value: null as number | null},
+  {label: '左前舱门放下', variable: 'DataR[4]', value: null as number | null},
+  {label: '左前舱门收上', variable: 'DataR[5]', value: null as number | null},
+  {label: '左后舱门放下', variable: 'DataR[6]', value: null as number | null},
+  {label: '左后舱门收上', variable: 'DataR[7]', value: null as number | null},
+  {label: '左起落架放下', variable: 'DataR[8]', value: null as number | null},
+  {label: '左起落架收上', variable: 'DataR[9]', value: null as number | null},
+  {label: '右前舱门放下', variable: 'DataR[10]', value: null as number | null},
+  {label: '右前舱门收上', variable: 'DataR[11]', value: null as number | null},
+  {label: '右后舱门放下', variable: 'DataR[12]', value: null as number | null},
+  {label: '右后舱门收上', variable: 'DataR[13]', value: null as number | null},
+  {label: '右起落架放下', variable: 'DataR[14]', value: null as number | null},
+  {label: '右起落架收上', variable: 'DataR[15]', value: null as number | null},
 ]);
 
 const groups = computed(() => [
