@@ -1,5 +1,5 @@
 <template>
-  <div class="ani-item" :class="status">
+  <div class="ani-item" :class="[status, {playing}]">
     <div class="ani-item-title">
       {{ title }}
       <img :src="statusIcon" alt="status" class="h-24px w-24px right-4px top-2px absolute">
@@ -8,6 +8,7 @@
       ref="videoRef"
       :src="videoSrc"
       muted
+      loop
       preload="metadata"
       class="h-full w-full object-cover"
       @loadedmetadata="onVideoMetadataLoaded"
@@ -51,6 +52,18 @@ function onVideoMetadataLoaded() {
   if (videoRef.value) {
     videoRef.value.currentTime = 0.001;
     isVideoLoaded.value = true;
+
+    // 视频加载完成后，根据初始状态处理
+    if (props.status === 'success') {
+      // 如果初始就是成功状态，跳到最后一帧
+      videoRef.value.currentTime = videoRef.value.duration || 0;
+    } else if (props.playing) {
+      // 如果 playing 为 true，立即开始播放
+      videoRef.value.currentTime = 0;
+      videoRef.value.play().catch((err) => {
+        console.warn(`[AniItem] 视频播放失败: ${props.title}`, err);
+      });
+    }
   }
 }
 
@@ -67,14 +80,14 @@ watch(() => props.playing, (isPlaying) => {
   } else {
     videoRef.value.pause();
   }
-});
+}, {immediate: true}); // 添加 immediate 以处理初始状态
 
 // status 变为 success 时跳到最后一帧
 watch(() => props.status, (status) => {
   if (status === 'success' && videoRef.value && isVideoLoaded.value) {
     videoRef.value.currentTime = videoRef.value.duration || 0;
   }
-});
+}, {immediate: true}); // 添加 immediate 以处理初始状态为 success 的情况
 </script>
 
 <style scoped lang="scss">
@@ -91,6 +104,16 @@ watch(() => props.status, (status) => {
     img {
       opacity: 1;
     }
+  }
+
+  // 播放中状态：覆盖 pending 的 opacity
+  &.playing {
+    opacity: 1 !important;
+  }
+
+  // 成功状态：保持完全不透明
+  &.success {
+    opacity: 1;
   }
 
   &-title {
