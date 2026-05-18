@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
+import {DATA_REFRESH_INTERVAL, pageReadyPromise, readVariable} from '@/api/plc-auth';
 
 const data = reactive([
   {label: '测试计划总数', variable: 'DataI[0]', value: null as number | null},
@@ -44,11 +44,24 @@ async function fetchStatData() {
   }
 }
 
-fetchStatData();
-const timer = setInterval(fetchStatData, DATA_REFRESH_INTERVAL);
+let _pollTimer: ReturnType<typeof setTimeout> | null = null;
+let _pollAlive = true;
+
+async function poll() {
+  await fetchStatData();
+  if (_pollAlive) {
+    _pollTimer = setTimeout(poll, DATA_REFRESH_INTERVAL);
+  }
+}
+
+pageReadyPromise.then(poll);
 
 onUnmounted(() => {
-  clearInterval(timer);
+  _pollAlive = false;
+  if (_pollTimer !== null) {
+    clearTimeout(_pollTimer);
+    _pollTimer = null;
+  }
 });
 </script>
 

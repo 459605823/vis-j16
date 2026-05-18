@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
+import {DATA_REFRESH_INTERVAL, pageReadyPromise, readVariable} from '@/api/plc-auth';
 
 const data = reactive([
   {label: '液压源设定压力', variable: 'DataR[64]', value: null as number | null},
@@ -80,11 +80,24 @@ async function fetchSourceData() {
   }
 }
 
-fetchSourceData();
-const timer = setInterval(fetchSourceData, DATA_REFRESH_INTERVAL);
+let _pollTimer: ReturnType<typeof setTimeout> | null = null;
+let _pollAlive = true;
+
+async function poll() {
+  await fetchSourceData();
+  if (_pollAlive) {
+    _pollTimer = setTimeout(poll, DATA_REFRESH_INTERVAL);
+  }
+}
+
+pageReadyPromise.then(poll);
 
 onUnmounted(() => {
-  clearInterval(timer);
+  _pollAlive = false;
+  if (_pollTimer !== null) {
+    clearTimeout(_pollTimer);
+    _pollTimer = null;
+  }
 });
 </script>
 

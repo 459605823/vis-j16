@@ -26,6 +26,18 @@ const KEEPALIVE_INTERVAL_MS = 60 * 1000;
 
 export const DATA_REFRESH_INTERVAL = 1000;
 
+/**
+ * 页面关键资源（背景图、视频等）加载完成后 resolve。
+ * 各组件在首次 poll 前 await 此 Promise，避免初始资源加载时被 PLC 请求占满连接池。
+ */
+export const pageReadyPromise = new Promise<void>((resolve) => {
+  if (document.readyState === 'complete') {
+    resolve();
+  } else {
+    window.addEventListener('load', () => resolve(), {once: true});
+  }
+});
+
 // 自增 RPC ID
 let _idCounter = 0;
 function nextId() {
@@ -34,9 +46,6 @@ function nextId() {
 
 // 保活定时器
 let _keepaliveTimer: ReturnType<typeof setInterval> | null = null;
-
-// plc连接状态
-let isConnected = false;
 
 // ─── 类型 ────────────────────────────────────────────────────────────────────
 
@@ -127,8 +136,6 @@ export async function readVariable<T = any>(
   variable: string | string[],
   mode: PlcReadMode = 'simple',
 ): Promise<T | T[]> {
-  if (!isConnected)
-    return Promise.reject(new Error('[PLC] 未连接，无法读取变量'));
   const toPath = (v: string) => `${DB_NAME}.${v}`;
   if (Array.isArray(variable)) {
     const responses = await batchRpc(
@@ -165,7 +172,6 @@ export async function plcLogin(
   }
 
   tokenStore.set(result.token);
-  isConnected = true;
   startKeepalive();
 
   console.info(`[PLC] 登录成功，用户: ${user}`);
@@ -187,7 +193,6 @@ export async function plcLogout(): Promise<void> {
     console.warn('[PLC] 注销时发生错误:', e);
   } finally {
     tokenStore.clear();
-    isConnected = false;
     console.info('[PLC] 已注销');
   }
 }

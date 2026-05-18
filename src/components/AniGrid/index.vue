@@ -103,7 +103,7 @@
 
 <script setup lang="ts">
 import type {AnimationItem} from './plcParser';
-import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
+import {DATA_REFRESH_INTERVAL, pageReadyPromise, readVariable} from '@/api/plc-auth';
 import AniItem from './AniItem.vue';
 import {parsePlcData, getBit as plcGetBit} from './plcParser';
 
@@ -224,15 +224,26 @@ async function fetchPlcData() {
   }
 }
 
-// 初始读取
-fetchPlcData();
+// 用递归 setTimeout 替代 setInterval，保证同一时刻只有一个请求在途，
+// 避免 PLC 响应慢时请求堆积，占满浏览器连接池后阻塞视频加载。
+let _pollTimer: ReturnType<typeof setTimeout> | null = null;
+let _pollAlive = true;
 
-// 定时刷新
-const timer = setInterval(fetchPlcData, DATA_REFRESH_INTERVAL);
+async function poll() {
+  await fetchPlcData();
+  if (_pollAlive) {
+    _pollTimer = setTimeout(poll, DATA_REFRESH_INTERVAL);
+  }
+}
 
-// 组件卸载时清理定时器
+pageReadyPromise.then(poll);
+
 onUnmounted(() => {
-  clearInterval(timer);
+  _pollAlive = false;
+  if (_pollTimer !== null) {
+    clearTimeout(_pollTimer);
+    _pollTimer = null;
+  }
 });
 </script>
 

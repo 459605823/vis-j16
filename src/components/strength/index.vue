@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import {DATA_REFRESH_INTERVAL, readVariable} from '@/api/plc-auth';
+import {DATA_REFRESH_INTERVAL, pageReadyPromise, readVariable} from '@/api/plc-auth';
 
 const data = reactive([
   {label: '前舱门', variable: 'DataR[16]', value: null as number | null, max: 10},
@@ -140,11 +140,24 @@ async function fetchStrengthData() {
   }
 }
 
-fetchStrengthData();
-const timer = setInterval(fetchStrengthData, DATA_REFRESH_INTERVAL);
+let _pollTimer: ReturnType<typeof setTimeout> | null = null;
+let _pollAlive = true;
+
+async function poll() {
+  await fetchStrengthData();
+  if (_pollAlive) {
+    _pollTimer = setTimeout(poll, DATA_REFRESH_INTERVAL);
+  }
+}
+
+pageReadyPromise.then(poll);
 
 onUnmounted(() => {
-  clearInterval(timer);
+  _pollAlive = false;
+  if (_pollTimer !== null) {
+    clearTimeout(_pollTimer);
+    _pollTimer = null;
+  }
 });
 </script>
 
