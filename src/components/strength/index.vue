@@ -5,7 +5,7 @@
     </div>
     <div class="section-content px-12px py-16px">
       <div class="mb-36px flex">
-        <div class="mr-16px w-102px">
+        <div class="mr-10px w-110px">
           <div class="flex justify-between">
             <div class="main-text">
               {{ data[0].label }}
@@ -16,7 +16,7 @@
           </div>
           <Progress :value="getDisplayValue(data[0].value)" :max="data[0].max" />
         </div>
-        <div class="mr-16px w-102px">
+        <div class="w-110px">
           <div class="flex justify-between">
             <div class="main-text">
               {{ data[1].label }}
@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="mb-36px flex">
-        <div class="mr-16px w-102px">
+        <div class="mr-10px w-110px">
           <div class="flex justify-between">
             <div class="main-text">
               {{ data[2].label }}
@@ -40,7 +40,7 @@
           </div>
           <Progress :value="getDisplayValue(data[2].value)" :max="data[2].max" />
         </div>
-        <div class="mr-16px w-102px">
+        <div class="mr-10px w-110px">
           <div class="flex justify-between">
             <div class="main-text">
               {{ data[3].label }}
@@ -51,7 +51,7 @@
           </div>
           <Progress :value="getDisplayValue(data[3].value)" :max="data[3].max" />
         </div>
-        <div class="w-102px">
+        <div class="w-110px">
           <div class="flex justify-between">
             <div class="main-text">
               {{ data[4].label }}
@@ -64,18 +64,19 @@
         </div>
       </div>
       <div class="flex">
-        <div class="mr-16px w-102px">
+        <div class="mr-10px w-110px">
           <div class="flex justify-between">
             <div class="main-text">
               {{ data[5].label }}
             </div>
             <div class="value">
-              {{ formatValue(data[5].value) }}
+              <!-- {{ formatValue(data[5].value) }} -->
+              10.5KN
             </div>
           </div>
           <Progress :value="getDisplayValue(data[5].value)" :max="data[5].max" />
         </div>
-        <div class="mr-16px w-102px">
+        <div class="mr-10px w-110px">
           <div class="flex justify-between">
             <div class="main-text">
               {{ data[6].label }}
@@ -86,7 +87,7 @@
           </div>
           <Progress :value="getDisplayValue(data[6].value)" :max="data[6].max" />
         </div>
-        <div class="w-102px">
+        <div class="w-110px">
           <div class="flex justify-between">
             <div class="main-text">
               {{ data[7].label }}
