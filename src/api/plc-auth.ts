@@ -23,6 +23,7 @@ const DB_NAME = '"WebData"';
 
 // 保活间隔：60 秒（PLC Session 超时为 120 秒）
 const KEEPALIVE_INTERVAL_MS = 60 * 1000;
+const RECONNECT_INTERVAL_MS = 10 * 1000;
 
 export const DATA_REFRESH_INTERVAL = 1000;
 
@@ -44,8 +45,8 @@ function nextId() {
   return ++_idCounter;
 }
 
-// 保活定时器
-let _keepaliveTimer: ReturnType<typeof setInterval> | null = null;
+// 保活 / 重连定时器
+let _keepaliveTimer: ReturnType<typeof setTimeout> | null = null;
 
 // ─── 类型 ────────────────────────────────────────────────────────────────────
 
@@ -199,35 +200,45 @@ export async function plcLogout(): Promise<void> {
 
 // ─── 保活 ─────────────────────────────────────────────────────────────────────
 
+/** 调度下一次保活/重连，delay 由调用方根据状态决定 */
+function scheduleNext(delay: number) {
+  _keepaliveTimer = setTimeout(keepaliveTask, delay);
+}
+
+async function keepaliveTask() {
+  _keepaliveTimer = null;
+
+  // 无 Token：初始登录失败或 Session 已失效 → 10s 重连
+  if (!tokenStore.has()) {
+    try {
+      await plcLogin(); // 成功后 plcLogin 内部调用 startKeepalive，切换至 60s 保活
+    } catch (e) {
+      console.warn('[PLC] 重连尝试失败，10s 后重试...', e);
+      scheduleNext(RECONNECT_INTERVAL_MS);
+    }
+    return;
+  }
+
+  // 有 Token：发送 Ping 保活
+  try {
+    await rpc<string>('Api.Ping');
+    scheduleNext(KEEPALIVE_INTERVAL_MS);
+  } catch (e) {
+    // Ping 失败 → Session 可能已过期，清除 Token，10s 后重新登录
+    console.warn('[PLC] Keepalive Ping 失败，将在 10s 后重新登录...', e);
+    tokenStore.clear();
+    scheduleNext(RECONNECT_INTERVAL_MS);
+  }
+}
+
 function startKeepalive() {
   stopKeepalive(); // 防止重复启动
-
-  _keepaliveTimer = setInterval(async () => {
-    if (!tokenStore.has()) {
-      stopKeepalive();
-      return;
-    }
-
-    try {
-      await rpc<string>('Api.Ping');
-    } catch (e) {
-      // Ping 失败 → Session 可能已过期，尝试重新登录
-      console.warn('[PLC] Keepalive Ping 失败，尝试重新登录...', e);
-      tokenStore.clear();
-      stopKeepalive();
-
-      try {
-        await plcLogin();
-      } catch (loginErr) {
-        console.error('[PLC] 重新登录失败:', loginErr);
-      }
-    }
-  }, KEEPALIVE_INTERVAL_MS);
+  scheduleNext(KEEPALIVE_INTERVAL_MS);
 }
 
 function stopKeepalive() {
   if (_keepaliveTimer !== null) {
-    clearInterval(_keepaliveTimer);
+    clearTimeout(_keepaliveTimer);
     _keepaliveTimer = null;
   }
 }
@@ -237,7 +248,17 @@ function stopKeepalive() {
 /**
  * 应用启动时调用，完成首次登录
  * 建议在 main.ts 中 app.mount() 之前 await 本函数
+ *
+ * 若 PLC 尚未上线导致初始登录失败，会启动保活定时器持续重连，
+ * 待 PLC 上线后自动恢复认证，无需重启大屏。
  */
 export async function initPlcAuth(): Promise<void> {
-  await plcLogin();
+  try {
+    await plcLogin();
+  } catch (e) {
+    // 初始登录失败（PLC 未启动等），启动保活定时器以便 PLC 上线后自动重连
+    console.warn('[PLC] 初始登录失败，将每隔', KEEPALIVE_INTERVAL_MS / 1000, 's 自动重试...', e);
+    startKeepalive();
+    throw e;
+  }
 }
