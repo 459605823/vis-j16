@@ -3,7 +3,7 @@
     <div class="cam-order">
       {{ order }}
     </div>
-    <video ref="videoEl" class="cam-video" autoplay muted playsinline />
+    <video ref="videoEl" class="cam-video" autoplay muted playsinline @playing="handlePlaying" />
     <div v-if="status !== 'playing'" class="cam-overlay">
       <span v-if="status === 'loading'" class="cam-loading" />
       <span v-else-if="status === 'error'" class="cam-error-icon">✕</span>
@@ -23,9 +23,37 @@ const videoEl = ref<HTMLVideoElement>();
 const status = ref<'idle' | 'loading' | 'playing' | 'error'>('idle');
 let player: mpegts.Player | null = null;
 let retryTimer: ReturnType<typeof setTimeout> | null = null;
+let startupTimer: ReturnType<typeof setTimeout> | null = null;
+let stallTimer: ReturnType<typeof setInterval> | null = null;
+let playerGeneration = 0;
+let unmounted = false;
+let lastPlaybackTime = 0;
+let stalledDuration = 0;
 const RETRY_INTERVAL = 5000;
+const STARTUP_TIMEOUT = 15000;
+const STALL_CHECK_INTERVAL = 5000;
+const STALL_TIMEOUT = 15000;
+
+function clearRetryTimer() {
+  if (retryTimer) {
+    clearTimeout(retryTimer);
+    retryTimer = null;
+  }
+}
+
+function clearHealthTimers() {
+  if (startupTimer) {
+    clearTimeout(startupTimer);
+    startupTimer = null;
+  }
+  if (stallTimer) {
+    clearInterval(stallTimer);
+    stallTimer = null;
+  }
+}
 
 function destroyPlayer() {
+  clearHealthTimers();
   if (player) {
     player.pause();
     player.unload();
@@ -35,60 +63,112 @@ function destroyPlayer() {
   }
 }
 
+function scheduleRetry(rtspUrl: string, generation: number) {
+  if (unmounted || generation !== playerGeneration || rtspUrl !== props.rtsp)
+    return;
+
+  playerGeneration++;
+  status.value = 'error';
+  destroyPlayer();
+  clearRetryTimer();
+
+  retryTimer = setTimeout(() => {
+    retryTimer = null;
+    if (!unmounted && rtspUrl === props.rtsp)
+      createPlayer(rtspUrl);
+  }, RETRY_INTERVAL);
+}
+
+function startStallDetection(rtspUrl: string, generation: number) {
+  if (!videoEl.value)
+    return;
+
+  if (stallTimer)
+    clearInterval(stallTimer);
+
+  lastPlaybackTime = videoEl.value.currentTime;
+  stalledDuration = 0;
+  stallTimer = setInterval(() => {
+    if (!videoEl.value || generation !== playerGeneration)
+      return;
+
+    const currentTime = videoEl.value.currentTime;
+    if (currentTime > lastPlaybackTime) {
+      lastPlaybackTime = currentTime;
+      stalledDuration = 0;
+      return;
+    }
+
+    stalledDuration += STALL_CHECK_INTERVAL;
+    if (stalledDuration >= STALL_TIMEOUT)
+      scheduleRetry(rtspUrl, generation);
+  }, STALL_CHECK_INTERVAL);
+}
+
+function handlePlaying() {
+  if (!player || !videoEl.value)
+    return;
+
+  status.value = 'playing';
+  if (startupTimer) {
+    clearTimeout(startupTimer);
+    startupTimer = null;
+  }
+  startStallDetection(props.rtsp, playerGeneration);
+}
+
 function createPlayer(rtspUrl: string) {
   if (!videoEl.value || !rtspUrl)
     return;
-  if (!mpegts.isSupported())
+  if (!mpegts.isSupported()) {
+    status.value = 'error';
     return;
+  }
 
+  clearRetryTimer();
+  const generation = ++playerGeneration;
   destroyPlayer();
   status.value = 'loading';
 
   const streamUrl = `ws://localhost:3000/live?rtsp=${encodeURIComponent(rtspUrl)}`;
 
-  player = mpegts.createPlayer(
-    {
-      type: 'flv',
-      url: streamUrl,
-      isLive: true,
-      hasAudio: false,
-      hasVideo: true,
-    },
-    {
-      enableWorker: false,
-      enableStashBuffer: false,
-      lazyLoad: false,
-      autoCleanupSourceBuffer: true,
-      liveBufferLatencyChasing: true,
-      liveBufferLatencyMaxLatency: 2.0,
-      liveBufferLatencyMinRemain: 0.5,
-    },
-  );
+  try {
+    const nextPlayer = mpegts.createPlayer(
+      {
+        type: 'flv',
+        url: streamUrl,
+        isLive: true,
+        hasAudio: false,
+        hasVideo: true,
+      },
+      {
+        enableWorker: false,
+        enableStashBuffer: false,
+        lazyLoad: false,
+        autoCleanupSourceBuffer: true,
+        liveBufferLatencyChasing: true,
+        liveBufferLatencyMaxLatency: 2.0,
+        liveBufferLatencyMinRemain: 0.5,
+      },
+    );
 
-  player.attachMediaElement(videoEl.value);
+    player = nextPlayer;
+    nextPlayer.attachMediaElement(videoEl.value);
+    nextPlayer.on(mpegts.Events.ERROR, () => scheduleRetry(rtspUrl, generation));
 
-  player.on(mpegts.Events.ERROR, () => {
-    status.value = 'error';
-    destroyPlayer();
-    retryTimer = setTimeout(() => {
-      retryTimer = null;
-      createPlayer(rtspUrl);
-    }, RETRY_INTERVAL);
-  });
+    startupTimer = setTimeout(() => {
+      scheduleRetry(rtspUrl, generation);
+    }, STARTUP_TIMEOUT);
 
-  player.on(mpegts.Events.MEDIA_INFO, () => {
-    status.value = 'playing';
-  });
-
-  player.load();
-  player.play();
+    nextPlayer.load();
+    Promise.resolve(nextPlayer.play()).catch(() => scheduleRetry(rtspUrl, generation));
+  } catch {
+    scheduleRetry(rtspUrl, generation);
+  }
 }
 
 watch(() => props.rtsp, (val) => {
-  if (retryTimer) {
-    clearTimeout(retryTimer);
-    retryTimer = null;
-  }
+  clearRetryTimer();
   createPlayer(val);
 });
 
@@ -98,10 +178,9 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  if (retryTimer) {
-    clearTimeout(retryTimer);
-    retryTimer = null;
-  }
+  unmounted = true;
+  playerGeneration++;
+  clearRetryTimer();
   destroyPlayer();
 });
 </script>
